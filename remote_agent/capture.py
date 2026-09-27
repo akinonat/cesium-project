@@ -31,9 +31,12 @@ class Monitor:
     top: int
     width: int
     height: int
+    primary: bool = False
 
     def as_dict(self) -> dict:
         label = "Tüm ekranlar" if self.index == 0 else f"Ekran {self.index}"
+        if self.primary:
+            label += ", ana ekran"
         return {
             "index": self.index,
             "label": f"{label} ({self.width}×{self.height})",
@@ -61,7 +64,9 @@ class MssSource:
 
     def monitors(self) -> list[Monitor]:
         return [
-            Monitor(i, m["left"], m["top"], m["width"], m["height"])
+            # Windows'ta ana ekranın sol üst köşesi her zaman (0, 0)'dır
+            Monitor(i, m["left"], m["top"], m["width"], m["height"],
+                    primary=i > 0 and m["left"] == 0 and m["top"] == 0)
             for i, m in enumerate(self._sct().monitors)
         ]
 
@@ -79,7 +84,7 @@ class DemoSource:
     def __init__(self, width: int = 1280, height: int = 720) -> None:
         self._mons = [
             Monitor(0, 0, 0, width * 2, height),
-            Monitor(1, 0, 0, width, height),
+            Monitor(1, 0, 0, width, height, primary=True),
             Monitor(2, width, 0, width, height),
         ]
         self.pointer_fn = lambda: None  # imleci çizmek için (--demo)

@@ -289,14 +289,25 @@ setInterval(() => {
 }, 1000);
 
 // ---------------------------------------------------------------- ayarlar
+function savedMonitor() {
+  try { return localStorage.getItem("ra-monitor"); } catch { return null; }
+}
+
 function applyQuality() {
-  send({ t: "cfg", monitor: Number($("monitor").value || 1), ...PRESETS[$("quality").value] });
+  const cfg = { t: "cfg", ...PRESETS[$("quality").value] };
+  // Liste henüz dolmadıysa son seçilen ekranı iste; o da yoksa sunucu ana ekranı seçer
+  const mon = $("monitor").value || savedMonitor();
+  if (mon) cfg.monitor = Number(mon);
+  send(cfg);
 }
 $("quality").addEventListener("change", () => {
   try { localStorage.setItem("ra-quality", $("quality").value); } catch { /* yok say */ }
   applyQuality();
 });
-$("monitor").addEventListener("change", applyQuality);
+$("monitor").addEventListener("change", () => {
+  try { localStorage.setItem("ra-monitor", $("monitor").value); } catch { /* yok say */ }
+  applyQuality();
+});
 try {
   const q = localStorage.getItem("ra-quality");
   if (q && PRESETS[q]) $("quality").value = q;

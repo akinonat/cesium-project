@@ -103,7 +103,7 @@ deneyebilirsiniz.
 
 | Araç çubuğu | İşlev |
 |---|---|
-| Ekran seçimi | Birden fazla monitör varsa hangisinin gösterileceği |
+| Ekran seçimi | Birden fazla monitör varsa hangisinin gösterileceği. İlk bağlantıda Windows'un **ana ekranı** gelir, sonra son seçiminiz hatırlanır. "Tüm ekranlar" iki ekranı yan yana tek görüntüde verir ama yazılar çok küçülür; tek ekran seçmek daha rahattır |
 | Kalite | **Düşük**: mobil veri / zayıf bağlantı · **Orta**: varsayılan · **Yüksek**: tam çözünürlük |
 | ⌨ Klavye | Surface'in dokunmatik klavyesini açar (Type Cover takılıyken gerekmez) |
 | ⊞ Win, Alt+Tab, Win+D | Surface'in kendisinin yakaladığı tuş kombinasyonlarını uzak bilgisayara gönderir |

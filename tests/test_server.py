@@ -186,3 +186,26 @@ def test_hello_carries_watchdog_warnings(tmp_path):
             await ws.close()
 
     run(scenario())
+
+
+def test_defaults_to_primary_monitor():
+    from remote_agent.capture import Monitor
+
+    class TwoScreens(DemoSource):
+        def monitors(self):
+            # Dizüstü ekranı solda (ikinci), ana ekran sağda: sıra ana ekranı belirlemez
+            return [Monitor(0, -2560, 0, 4480, 1440), Monitor(1, -2560, 0, 2560, 1440),
+                    Monitor(2, 0, 0, 1920, 1080, primary=True)]
+
+    async def scenario():
+        cfg = Config(name="Test", password_hash=hash_password(PASSWORD, iterations=1000))
+        client = TestClient(TestServer(create_app(cfg, TwoScreens(), RecordingBackend())))
+        async with client:
+            await client.post("/api/login", json={"password": PASSWORD})
+            ws = await client.ws_connect("/ws", origin=str(client.make_url("/"))[:-1])
+            hello = json.loads((await ws.receive(timeout=5)).data)
+            assert hello["cfg"]["monitor"] == 2
+            assert "ana ekran" in hello["monitors"][2]["label"]
+            await ws.close()
+
+    run(scenario())

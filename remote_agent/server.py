@@ -199,7 +199,9 @@ class StreamSession:
         self.source = state.source
         self.backend = state.backend
         self.monitors: list[Monitor] = self.source.monitors()
-        self.monitor = 1 if len(self.monitors) > 1 else 0
+        self.monitor = next(
+            (m.index for m in self.monitors if m.primary), 1 if len(self.monitors) > 1 else 0
+        )
         self.fps = cfg.fps
         self.quality = cfg.quality
         self.max_width = cfg.max_width
