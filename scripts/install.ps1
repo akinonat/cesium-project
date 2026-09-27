@@ -125,11 +125,30 @@ Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Se
     -Principal $taskPrincipal -Description "Uzak Masaüstü Ajanı" -Force | Out-Null
 Start-ScheduledTask -TaskName $TaskName
 
+# --- 5b. Bekçi: her 5 dakikada Tailscale'i ve ajanı denetler, bozulanı onarır ------------
+Step "Bekçi görevi (5 dakikada bir denetim)"
+$wdAction = New-ScheduledTaskAction -Execute $VPyw `
+    -Argument "-m remote_agent.watchdog --config-dir `"$ConfigDir`"" -WorkingDirectory $InstallDir
+$wdTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(2) `
+    -RepetitionInterval (New-TimeSpan -Minutes 5)
+$wdSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries `
+    -ExecutionTimeLimit (New-TimeSpan -Minutes 3) -MultipleInstances IgnoreNew -StartWhenAvailable
+Register-ScheduledTask -TaskName "${TaskName}Watchdog" -Action $wdAction -Trigger $wdTrigger `
+    -Settings $wdSettings -Principal $taskPrincipal -Description "Uzak Masaüstü Ajanı bekçisi" -Force | Out-Null
+
 # --- 6. Güç ayarları ----------------------------------------------------------------------
 if (-not $KeepPowerSettings) {
     Step "Prizdeyken uyku/hazırda bekletme kapatılıyor"
     powercfg /change standby-timeout-ac 0
     powercfg /change hibernate-timeout-ac 0
+    # "Güç tasarrufu için bilgisayarın bu aygıtı kapatmasına izin ver" kapatılır;
+    # aksi halde ağ kartı uyuyup dışarıdan erişim kesilebilir
+    Get-NetAdapter -Physical -ErrorAction SilentlyContinue | ForEach-Object {
+        try {
+            Set-NetAdapterPowerManagement -Name $_.Name -AllowComputerToTurnOffDevice Disabled -ErrorAction Stop
+            Write-Host "Ağ kartı güç tasarrufu kapatıldı: $($_.Name)"
+        } catch { }
+    }
 }
 
 # --- 7. İsteğe bağlı: Windows Uzak Masaüstü (RDP) ----------------------------------------
@@ -163,4 +182,4 @@ if ($tsIp) {
 } else {
     Write-Warning "Tailscale bulunamadı. Dışarıdan erişim için https://tailscale.com/download adresinden kurup aynı hesapla giriş yapın."
 }
-Write-Host "Günlük dosyası          : $ConfigDir\agent.log"
+Write-Host "Günlük dosyaları        : $ConfigDir\agent.log, $ConfigDir\watchdog.log"

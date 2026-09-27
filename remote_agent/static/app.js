@@ -45,7 +45,8 @@ function overlay(text) {
 
 // ---------------------------------------------------------------- giriş
 async function checkSession() {
-  const r = await fetch("/api/session", { cache: "no-store" });
+  const r = await fetch("/api/session", { cache: "no-store", signal: AbortSignal.timeout(5000) });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const s = await r.json();
   document.title = `${s.name} – Uzak Masaüstü`;
   $("login-name").textContent = s.name;
@@ -90,36 +91,83 @@ function startRemote() {
   connect();
 }
 
+const PING_EVERY_MS = 5000;
+const DEAD_AFTER_MS = 15000; // bu süre hiç mesaj gelmezse bağlantı ölü sayılır
+let lastMessageAt = 0;
+let reconnectTimer = null;
+
 function connect() {
+  if (ws || loggedOut) return;
+  clearTimeout(reconnectTimer);
   const proto = location.protocol === "https:" ? "wss:" : "ws:";
-  ws = new WebSocket(`${proto}//${location.host}/ws`);
-  ws.binaryType = "arraybuffer";
+  const sock = new WebSocket(`${proto}//${location.host}/ws`);
+  ws = sock;
+  sock.binaryType = "arraybuffer";
+  lastMessageAt = Date.now();
   overlay("Bağlanıyor…");
 
-  ws.onopen = () => {
+  sock.onopen = () => {
     reconnectDelay = 1000;
     applyQuality();
   };
-  ws.onmessage = (ev) => {
+  sock.onmessage = (ev) => {
+    lastMessageAt = Date.now();
     if (typeof ev.data === "string") onJson(JSON.parse(ev.data));
     // Kareler sırayla çizilmeli: fark döşemeleri önceki karenin üstüne gelir
     else frameChain = frameChain.then(() => onFrame(ev.data));
   };
-  ws.onclose = async () => {
-    ws = null;
-    if (loggedOut) return;
-    let authed = false;
-    try { authed = await checkSession(); } catch { /* ağ yok */ }
-    if (!authed && navigator.onLine) {
-      showView("login");
-      $("login-error").textContent = "Oturum sona erdi, tekrar giriş yapın.";
-      return;
-    }
-    overlay(`Bağlantı koptu. ${Math.round(reconnectDelay / 1000)} sn içinde yeniden denenecek…`);
-    setTimeout(connect, reconnectDelay);
-    reconnectDelay = Math.min(reconnectDelay * 2, 15000);
-  };
+  sock.onclose = () => onDisconnected(sock);
 }
+
+// Ağ değişince (Wi-Fi -> mobil veri) eski bağlantı hata vermeden "ölebilir".
+// Düzenli ping atıp yanıt gelmezse bağlantıyı bırakıp yeniden kuruyoruz.
+setInterval(() => {
+  if (!ws) return;
+  if (Date.now() - lastMessageAt > DEAD_AFTER_MS) {
+    const dead = ws;
+    dead.onclose = null;
+    dead.onmessage = null;
+    try { dead.close(); } catch { /* yok say */ }
+    onDisconnected(dead);
+  } else {
+    send({ t: "ping" });
+  }
+}, PING_EVERY_MS);
+
+async function onDisconnected(sock) {
+  if (ws !== sock) return;
+  ws = null;
+  // Sunucu bağlantı kopunca basılı tuşları zaten bırakır; yerel durumu da sıfırla
+  heldMods.clear();
+  sentKeys.clear();
+  if (loggedOut) return;
+  overlay("Bağlantı koptu, kontrol ediliyor…");
+
+  // Sunucuya ulaşılamıyorsa (internet yok, bilgisayar kapalı) denemeye devam et;
+  // yalnızca sunucu "oturum geçersiz" derse giriş ekranına dön.
+  let authed = null;
+  try { authed = await checkSession(); } catch { /* ulaşılamıyor */ }
+  if (authed === false) {
+    showView("login");
+    $("login-error").textContent = "Oturum sona erdi, tekrar giriş yapın.";
+    return;
+  }
+  const secs = Math.round(reconnectDelay / 1000);
+  overlay(`Bağlantı koptu. ${secs} sn içinde yeniden denenecek…\n(Hemen denemek için dokunun)`);
+  reconnectTimer = setTimeout(connect, reconnectDelay);
+  reconnectDelay = Math.min(reconnectDelay * 2, 15000);
+}
+
+function reconnectNow() {
+  if (ws || loggedOut || $("remote").hidden) return;
+  reconnectDelay = 1000;
+  connect();
+}
+window.addEventListener("online", reconnectNow);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") reconnectNow();
+});
+$("overlay").addEventListener("click", reconnectNow);
 
 function onJson(msg) {
   switch (msg.t) {
@@ -133,6 +181,7 @@ function onJson(msg) {
         sel.appendChild(o);
       }
       sel.value = msg.cfg.monitor;
+      showStatus(msg.status);
       break;
     }
     case "cfg":
@@ -158,6 +207,19 @@ function onJson(msg) {
       break;
   }
 }
+
+// Bekçinin raporu: çözemediği sorunlar kalıcı uyarı, onardıkları kısa bilgi olarak
+function showStatus(status) {
+  const warnings = (status && status.warnings) || [];
+  $("banner").textContent = warnings.map((w) => `⚠ ${w}`).join("\n");
+  $("banner").hidden = warnings.length === 0;
+  const actions = (status && status.actions) || [];
+  if (actions.length) {
+    const at = new Date(status.checked_at).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+    toast(`Bekçi (${at}): ${actions.join("; ")}`, 6000);
+  }
+}
+$("banner").addEventListener("click", () => ($("banner").hidden = true));
 
 // ---------------------------------------------------------------- görüntü
 async function onFrame(buf) {

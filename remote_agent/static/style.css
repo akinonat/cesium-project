@@ -43,6 +43,9 @@ button.danger { border-color: var(--danger); color: #ffb1b1; }
   opacity: .6; border-top-left-radius: 0; border-top-right-radius: 0; }
 #btn-show:hover { opacity: 1; }
 
+#banner { background: #5a3d0a; color: #ffe2a8; padding: 8px 12px; cursor: pointer;
+  white-space: pre-line; border-bottom: 1px solid #7a5512; }
+
 #stage { position: relative; flex: 1; min-height: 0; display: grid; place-items: center;
   overflow: hidden; background: #000; }
 #screen { display: block; touch-action: none; outline: none; cursor: default;

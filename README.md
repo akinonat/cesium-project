@@ -30,8 +30,9 @@ barındırdığınız bir uzak masaüstü yazılımı.
   Ctrl+C / Ctrl+V gibi kısayollar, dokunmatik klavye düğmesi
 - Tek tıkla: Başlat (Win), Alt+Tab, Win+D, Görev Yöneticisi
 - **Pano**: uzak panodaki metni al, kendi metninizi uzak panoya gönder veya yazdır
-- Bağlantı koparsa otomatik yeniden bağlanma
 - Ofis PC'nin uykuya geçmesini engeller
+- Bağlantı koparsa parola sormadan otomatik yeniden bağlanır; bekçi görevi
+  Tailscale'i ve ajanı 5 dakikada bir denetleyip onarır
 - Güvenlik: PBKDF2 ile saklanan parola, kaba kuvvet denemelerine karşı artan
   kilitleme, HttpOnly/SameSite oturum çerezi, WebSocket kaynak (Origin) denetimi,
   sıkı içerik güvenlik politikası, bağlantı koparsa basılı kalan tuşların bırakılması
@@ -172,6 +173,67 @@ Ajan, Windows'ta **oturum açmış kullanıcı** olarak çalışır. Bu yüzden:
 - [ ] Uyku kapalı (betik yapar); dizüstü ise kapak kapatıldığında "Hiçbir şey yapma"
 - [ ] BIOS'ta **"Restore on AC Power Loss → Power On"** (elektrik kesintisinden sonra kendiliğinden açılsın)
 - [ ] Windows Update için **Etkin saatler**'i çalışma saatlerinize göre ayarlayın
+- [ ] Mümkünse Wi-Fi yerine **kablolu** internet
+- [ ] Tailscale menüsünde **Preferences → Run unattended** açık (oturum kapansa bile Tailscale bağlı kalır)
+
+---
+
+## Bağlantı kesintileri
+
+**Bağlantı giderse:** Surface'te *"Bağlantı koptu, … sn içinde yeniden denenecek"*
+yazar ve program kendiliğinden yeniden bağlanmayı dener (1 sn'den başlayıp en fazla
+15 sn arayla, süresiz). İnternet geri gelince veya uygulamaya geri dönünce hemen
+dener; beklemek istemezseniz uyarıya dokunun. **Parolayı tekrar girmeniz gerekmez.**
+Wi-Fi'dan mobil veriye geçerken "sessizce ölen" bağlantılar da en geç ~20 sn'de
+fark edilir. Bağlantı koptuğu anda basılı olan tuşlar ve fare düğmeleri ofis
+bilgisayarında otomatik bırakılır (takılı Ctrl kalmaz). Kesinti sırasında
+yazdıklarınız karşıya ulaşmaz; bağlanınca son yazdığınızı kontrol edin.
+
+**Ofis bilgisayarı açık ama bağlanılamıyorsa:** kurulum, her 5 dakikada bir
+çalışan bir **bekçi** görevi ekler (`RemoteAgentWatchdog`). Bekçi:
+
+- Tailscale hizmeti durmuşsa başlatır, Tailscale kapatılmışsa yeniden açar,
+- Ajan çökmüş ya da donmuşsa yeniden başlatır,
+- Kendi çözemediği sorunları — Tailscale'in yeniden giriş istemesi veya anahtar
+  süresinin **14 günden az** kalması — kaydeder; Surface'ten bağlandığınızda ekranın
+  üstünde **sarı uyarı şeridi** olarak görürsünüz. Böylece erişim kesilmeden önce
+  haberiniz olur.
+
+Tüm onarımlar `C:\ProgramData\RemoteAgent\watchdog.log` dosyasına yazılır.
+Dışarıdayken hangi tarafta sorun olduğunu anlamak için Surface'teki Tailscale
+uygulamasına bakın: ofis bilgisayarı orada **çevrimiçi** görünüyor ama sayfa
+açılmıyorsa sorun ajandadır ve bekçi en geç 5 dakikada onu yeniden başlatır.
+**Çevrimdışı** görünüyorsa sorun ofisin internetinde veya bilgisayarın gücündedir.
+
+## Bilgisayarı uzaktan açma ve otomatik oturum açma
+
+Bilgisayar kapalıysa (elektrik kesintisi, biri kapattı) uzaktan açmak için:
+
+- **En kolayı:** BIOS'ta *Restore on AC Power Loss → Power On* ayarı + **akıllı
+  priz**. Prizi uygulamadan kapatıp açınca bilgisayar kendiliğinden açılır. Bunu
+  yalnızca bilgisayar zaten kapalıyken veya tamamen donmuşken yapın; açıkken elektriği
+  kesmek kaydedilmemiş işleri kaybettirir.
+- **Mekanik düğme basıcı:** güç düğmesine basan uzaktan kumandalı bir düzenek
+  (hazır ürün olarak SwitchBot Bot gibi) de işe yarar.
+
+Açıldıktan sonra ajanın çalışması için Windows'ta **oturum açılmış** olması gerekir.
+Parola ekranını atlayıp doğrudan masaüstüne gelmek için Microsoft'un ücretsiz
+**Sysinternals Autologon** aracını kullanın (parolayı şifreli saklar; kayıt defterine
+düz metin yazmaktan daha güvenlidir):
+
+1. <https://learn.microsoft.com/sysinternals/downloads/autologon> adresinden indirin.
+2. Microsoft hesabıyla ve Windows Hello (PIN) ile giriş yapıyorsanız önce
+   Ayarlar → Hesaplar → Oturum açma seçenekleri → *"Gelişmiş güvenlik için bu cihazda
+   Microsoft hesapları için yalnızca Windows Hello oturum açmaya izin ver"* seçeneğini
+   **kapatın**.
+3. `Autologon64.exe`'yi çalıştırın, kullanıcı adı ve Windows parolanızı (PIN değil)
+   girip **Enable**'a basın.
+
+⚠ Otomatik oturum açmada ofiste bilgisayarın başına geçen herkes masaüstünüze erişir.
+Ofis fiziksel olarak güvenli değilse bunu yapmayın. Ofis bilgisayarı **Windows Pro**
+ise daha iyi bir yol var: kurulumda `-EnableRdp` ekleyin. Windows Uzak Masaüstü,
+bilgisayar açılıp **oturum açılmadan** da bağlanmanıza izin verir; otomatik oturum
+açmaya gerek kalmaz.
 
 ---
 
@@ -207,7 +269,8 @@ Stop-ScheduledTask RemoteAgent; Start-ScheduledTask RemoteAgent
 
 | Belirti | Ne yapmalı |
 |---|---|
-| Surface'ten sayfa açılmıyor | Her iki cihazda Tailscale bağlı mı? Ofis PC'de <http://localhost:8765> açılıyor mu? `Get-ScheduledTask RemoteAgent` durumu *Running* mi? |
+| Surface'ten sayfa açılmıyor | Her iki cihazda Tailscale bağlı mı? Ofis PC'de <http://localhost:8765> açılıyor mu? `Get-ScheduledTask RemoteAgent` durumu *Running* mi? Ayrıca bkz. [Bağlantı kesintileri](#bağlantı-kesintileri) |
+| Sarı uyarı şeridi çıkıyor | Bekçinin çözemediği bir sorun var (çoğunlukla Tailscale anahtarı); şeritteki talimatı izleyin |
 | Siyah ekran / "kilitli" uyarısı | Ofis PC kilitli ya da UAC penceresi açık — bkz. [Kilit ekranı](#kilit-ekranı-önemli) |
 | Yönetici olarak açılmış bir pencereye tıklanamıyor | Görev "en yüksek ayrıcalıklarla" çalışmalı; `install.ps1`'i yönetici olarak yeniden çalıştırın |
 | Görüntü yavaş | Kaliteyi **Düşük** yapın; mobil veride Tailscale doğrudan bağlantı kuramazsa (DERP röle) hız düşebilir |
@@ -239,6 +302,7 @@ remote_agent/
   capture.py     ekran yakalama (mss) ve değişen döşemeleri JPEG olarak kodlama
   input_win.py   fare/klavye (Windows SendInput)
   winutil.py     DPI, uyku engelleme, pano, kilit algılama
+  watchdog.py    bekçi: Tailscale ve ajanı denetler, onarır, uyarı yazar
   static/        tarayıcı arayüzü (HTML/CSS/JS, harici bağımlılık yok)
 scripts/
   install.ps1    Windows kurulum (görev, güvenlik duvarı, güç, isteğe bağlı RDP)

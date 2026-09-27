@@ -18,6 +18,7 @@ from . import winutil
 from .capture import FrameEncoder, Monitor, scale_to_width
 from .config import Config, verify_password
 from .input_win import InputBackend
+from .watchdog import read_status
 
 log = logging.getLogger("remote_agent")
 
@@ -25,6 +26,7 @@ STATIC_DIR = Path(__file__).parent / "static"
 COOKIE = "ra_session"
 MAX_INFLIGHT = 2
 CFG_KEY = web.AppKey("cfg", Config)
+STATUS_KEY = web.AppKey("status_path", object)
 STATE_KEY = web.AppKey("state", "AppState")
 
 
@@ -189,8 +191,10 @@ async def api_logout(request: web.Request) -> web.Response:
 # --- WebSocket: yayın + girdi ---------------------------------------------------------
 
 class StreamSession:
-    def __init__(self, ws: web.WebSocketResponse, state: AppState, cfg: Config):
+    def __init__(self, ws: web.WebSocketResponse, state: AppState, cfg: Config,
+                 status_path: Path | None = None):
         self.ws = ws
+        self.status_path = status_path
         self.state = state
         self.source = state.source
         self.backend = state.backend
@@ -226,6 +230,8 @@ class StreamSession:
             "t": "hello",
             "monitors": [m.as_dict() for m in self.monitors],
             "cfg": self.cfg_dict(),
+            # Bekçinin son raporu: uyarılar (ör. Tailscale anahtarı dolmak üzere)
+            "status": read_status(self.status_path) if self.status_path else None,
         }
 
     def cfg_dict(self) -> dict:
@@ -292,7 +298,9 @@ class StreamSession:
     async def handle(self, msg: dict) -> None:
         t = msg.get("t")
         b = self.backend
-        if t == "ack":
+        if t == "ping":
+            await self.send_json({"t": "pong"})
+        elif t == "ack":
             self.inflight = max(0, self.inflight - 1)
             self.acked.set()
         elif t == "mm":
@@ -347,7 +355,7 @@ async def ws_handler(request: web.Request) -> web.StreamResponse:
     ws = web.WebSocketResponse(heartbeat=20, max_msg_size=2 * 1024 * 1024)
     await ws.prepare(request)
     state = request.app[STATE_KEY]
-    session = StreamSession(ws, state, request.app[CFG_KEY])
+    session = StreamSession(ws, state, request.app[CFG_KEY], request.app[STATUS_KEY])
     state.active_streams += 1
     log.info("Uzak oturum başladı: %s", request.remote)
     await session.send_json(session.hello())
@@ -373,9 +381,11 @@ async def ws_handler(request: web.Request) -> web.StreamResponse:
     return ws
 
 
-def create_app(cfg: Config, source, backend: InputBackend) -> web.Application:
+def create_app(cfg: Config, source, backend: InputBackend,
+               status_path: Path | None = None) -> web.Application:
     app = web.Application(middlewares=[security_headers], client_max_size=64 * 1024)
     app[CFG_KEY] = cfg
+    app[STATUS_KEY] = status_path
     app[STATE_KEY] = AppState(source, backend, SessionStore(cfg.session_hours * 3600))
     app.router.add_get("/", index)
     app.router.add_get("/api/session", api_session)

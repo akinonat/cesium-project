@@ -18,6 +18,10 @@ if (Get-ScheduledTask -TaskName "RemoteAgent" -ErrorAction SilentlyContinue) {
     Unregister-ScheduledTask -TaskName "RemoteAgent" -Confirm:$false
     Write-Host "Zamanlanmış görev kaldırıldı."
 }
+if (Get-ScheduledTask -TaskName "RemoteAgentWatchdog" -ErrorAction SilentlyContinue) {
+    Unregister-ScheduledTask -TaskName "RemoteAgentWatchdog" -Confirm:$false
+    Write-Host "Bekçi görevi kaldırıldı."
+}
 Get-NetFirewallRule -DisplayName "RemoteAgent*" -ErrorAction SilentlyContinue | Remove-NetFirewallRule
 Write-Host "Güvenlik duvarı kuralları kaldırıldı."
 

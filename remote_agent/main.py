@@ -150,7 +150,8 @@ def main(argv: list[str] | None = None) -> None:
     log.info("Uzak Masaüstü Ajanı %s başlıyor: %s://%s:%d  (%s)",
              __version__, scheme, socket.gethostname(), cfg.port, cfg.name)
     try:
-        web.run_app(create_app(cfg, source, backend), host=cfg.host, port=cfg.port,
+        app = create_app(cfg, source, backend, status_path=args.config_dir / "status.json")
+        web.run_app(app, host=cfg.host, port=cfg.port,
                     ssl_context=ssl_ctx, print=None, access_log=None)
     finally:
         winutil.keep_awake(False)

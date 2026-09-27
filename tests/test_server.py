@@ -143,3 +143,46 @@ def test_locked_desktop_notifies_client(monkeypatch):
             await ws.close()
 
     run(scenario())
+
+
+def test_ping_pong():
+    async def scenario():
+        client, _ = make_client()
+        async with client:
+            await client.post("/api/login", json={"password": PASSWORD})
+            base = str(client.make_url("/"))[:-1]
+            ws = await client.ws_connect("/ws", origin=base)
+            await ws.send_str('{"t":"ping"}')
+            for _ in range(20):
+                msg = await ws.receive(timeout=5)
+                if msg.type == WSMsgType.BINARY:
+                    await ws.send_str('{"t":"ack"}')
+                elif json.loads(msg.data)["t"] == "pong":
+                    break
+            else:
+                raise AssertionError("pong gelmedi")
+            await ws.close()
+
+    run(scenario())
+
+
+def test_hello_carries_watchdog_warnings(tmp_path):
+    import datetime as dt
+
+    status = tmp_path / "status.json"
+    status.write_text(json.dumps({
+        "checked_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+        "tailscale": "Running", "warnings": ["dikkat"], "actions": [],
+    }), encoding="utf-8")
+
+    async def scenario():
+        cfg = Config(name="Test", password_hash=hash_password(PASSWORD, iterations=1000))
+        client = TestClient(TestServer(create_app(cfg, DemoSource(64, 36), RecordingBackend(), status)))
+        async with client:
+            await client.post("/api/login", json={"password": PASSWORD})
+            ws = await client.ws_connect("/ws", origin=str(client.make_url("/"))[:-1])
+            hello = json.loads((await ws.receive(timeout=5)).data)
+            assert hello["status"]["warnings"] == ["dikkat"]
+            await ws.close()
+
+    run(scenario())
