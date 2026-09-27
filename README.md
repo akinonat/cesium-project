@@ -166,6 +166,31 @@ Ajan, Windows'ta **oturum açmış kullanıcı** olarak çalışır. Bu yüzden:
    *"Kullanıcı Hesabı Denetimi: Yükseltme istenirken güvenli masaüstüne geç"* →
    Devre dışı). Bu, güvenliği bir miktar azaltır.
 
+### Yönetici izni isteyen programlar ("Evet/Hayır" penceresi)
+
+Yönetici izni isteyen bir program açılınca Windows'un "Evet/Hayır" (UAC) penceresi
+güvenli masaüstünde çıkar; bu pencere uzaktan **görülemez ve tıklanamaz**. Hangi
+programların bunu yapacağını önceden görmek için (proje klasöründe, PowerShell'de):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\yonetici-tara.ps1
+```
+
+Listede çıkan bir program için önce kısayolun **Özellikler → Uyumluluk →
+"Bu programı yönetici olarak çalıştır"** kutusunu kaldırmayı deneyin; program
+izinsiz de düzgün çalışıyorsa sorun biter. Gerçekten yönetici izni gerekiyorsa,
+yönetici PowerShell'de o program için **sormadan açan** bir masaüstü kısayolu
+oluşturun:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\yonetici-kisayol.ps1 -Exe "C:\Program Files\...\program.exe"
+# Kaldırmak için:  ... -Name "program" -Remove
+```
+
+Bu kısayol programa dosya adı iletmez; dosyaları program açıldıktan sonra
+*Dosya → Aç* ile açın. **"Açılışta"** diye listelenen programlar bilgisayar yeniden
+başladığında pencere açıp uzaktan erişimi engelleyebileceği için önceliklidir.
+
 ### Ofis bilgisayarı için kontrol listesi
 
 - [ ] Tailscale kurulu, oturum açık, *key expiry* kapalı
@@ -308,4 +333,6 @@ scripts/
   install.ps1    Windows kurulum (görev, güvenlik duvarı, güç, isteğe bağlı RDP)
   uninstall.ps1  kaldırma
   run-console.bat  sorun giderme için konsolda çalıştırma
+  yonetici-tara.ps1     yönetici izni (UAC) isteyecek programları listeler
+  yonetici-kisayol.ps1  bir programı UAC sormadan açan kısayol oluşturur
 ```
