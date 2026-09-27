@@ -21,17 +21,19 @@ izleyin. Genel kullanım ve sorun giderme için `README.md` dosyasına bakın.
 | Program | `C:\Program Files\RemoteAgent` |
 | Ayarlar ve günlükler | `C:\ProgramData\RemoteAgent` (`agent.log`, `watchdog.log`) |
 | Kurulum dosyaları | `C:\uzak-masaustu` |
-| Kaynak kod | https://github.com/akinonat/uzak-masaustu (gizli depo) |
+| Yedek | Google Drive'daki `uzak-masaustu.zip` (ikinci kopya: GitHub `akinonat/cesium-project` deposu, `claude/windows-remote-desktop-control-5e94s7` dalı) |
 
 ## Sıfırdan kurulum
 
 ### 1. Kurulum dosyalarını indirin
 
-1. https://github.com/akinonat/uzak-masaustu/archive/refs/heads/main.zip adresinden
-   ZIP'i indirin (GitHub'a giriş yapmış olmalısınız; depo gizli). GitHub'a
-   ulaşamazsanız Google Drive'daki yedek ZIP'i kullanın.
-2. ZIP'e sağ tık → **Tümünü ayıkla** → hedef `C:\`.
-3. Oluşan klasörün adını `uzak-masaustu` yapın → `C:\uzak-masaustu`.
+1. Google Drive'daki **uzak-masaustu.zip** dosyasını indirin.
+2. ZIP'e sağ tık → **Tümünü ayıkla** → hedef `C:\`. Klasör doğrudan
+   `C:\uzak-masaustu` olarak çıkar.
+
+   Drive'daki ZIP'e ulaşamazsanız ikinci kopya (GitHub'a giriş yapmış olmalısınız):
+   https://github.com/akinonat/cesium-project/archive/refs/heads/claude/windows-remote-desktop-control-5e94s7.zip
+   — bu ZIP'ten çıkan klasörün adını `uzak-masaustu` yapın.
 
 ### 2. Tailscale
 
