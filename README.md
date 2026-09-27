@@ -60,13 +60,13 @@ barındırdığınız bir uzak masaüstü yazılımı.
 
 ### 2. Ajanı ofis bilgisayarına kurun
 
-1. Bu depoyu ofis bilgisayarına indirin (GitHub'da **Code → Download ZIP**, sonra
-   ZIP'i bir klasöre çıkarın).
+1. Bu depoyu ofis bilgisayarına indirin (GitHub'da **Code → Download ZIP**), ZIP'i
+   `C:\` içine çıkarın ve oluşan klasörün adını `uzak-masaustu` yapın.
 2. **Başlat** menüsüne `PowerShell` yazın → **Yönetici olarak çalıştır**.
 3. Proje klasörüne gidip kurulum betiğini çalıştırın:
 
    ```powershell
-   cd "C:\Users\<kullanici>\Downloads\cesium-project"
+   cd C:\uzak-masaustu
    powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
    ```
 
