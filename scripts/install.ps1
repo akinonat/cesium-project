@@ -8,7 +8,8 @@
     - Giriş parolasını sorar
     - Windows oturumu açıldığında ajanı otomatik başlatan bir Zamanlanmış Görev oluşturur
     - Güvenlik duvarında portu YALNIZCA Tailscale ağına (100.64.0.0/10) açar
-    - Bilgisayarın prizdeyken uykuya geçmesini kapatır
+    - Bilgisayarın prizdeyken uykuya geçmesini kapatır; dizüstüde kapak kapanınca
+      uyumaz ve ekran uyanınca parola sormaz
     - İsteğe bağlı: Windows Uzak Masaüstü'nü (RDP) açar (yalnızca Pro/Enterprise)
 
 .EXAMPLE
@@ -141,6 +142,11 @@ if (-not $KeepPowerSettings) {
     Step "Prizdeyken uyku/hazırda bekletme kapatılıyor"
     powercfg /change standby-timeout-ac 0
     powercfg /change hibernate-timeout-ac 0
+    # Dizüstü: prizdeyken kapak kapatılınca hiçbir şey yapma, ekran uyanınca parola sorma
+    powercfg /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0
+    powercfg /setacvalueindex SCHEME_CURRENT SUB_NONE CONSOLELOCK 0
+    powercfg /setactive SCHEME_CURRENT
+    Write-Host "Prizdeyken: kapak kapanınca uyumaz, uyanınca parola sormaz."
     # "Güç tasarrufu için bilgisayarın bu aygıtı kapatmasına izin ver" kapatılır;
     # aksi halde ağ kartı uyuyup dışarıdan erişim kesilebilir
     Get-NetAdapter -Physical -ErrorAction SilentlyContinue | ForEach-Object {

@@ -18,6 +18,9 @@ barındırdığınız bir uzak masaüstü yazılımı.
 └──────────────┘                                           └──────────────────┘
 ```
 
+> Ev bilgisayarına (ASUS ROG Strix) yapılan kurulumun adım adım kaydı ve yeniden
+> kurulum listesi: [KURULUM-NOTLARI.md](KURULUM-NOTLARI.md)
+
 ## Özellikler
 
 - Canlı ekran; yalnızca **değişen bölgeler** gönderilir (düşük bant genişliği)
