@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="color-scheme" content="dark">
+  <title>Uzak Masaüstü</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <section id="login" class="view" hidden>
+    <form id="login-form" class="card" autocomplete="off">
+      <h1>Uzak Masaüstü</h1>
+      <p class="muted" id="login-name"></p>
+      <label for="password">Parola</label>
+      <input id="password" type="password" autocomplete="current-password" required autofocus>
+      <button type="submit" class="primary">Bağlan</button>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+  </section>
+
+  <section id="remote" class="view" hidden>
+    <header id="toolbar">
+      <strong id="pc-name">—</strong>
+      <select id="monitor" title="Ekran"></select>
+      <select id="quality" title="Görüntü kalitesi">
+        <option value="low">Düşük (hızlı)</option>
+        <option value="mid" selected>Orta</option>
+        <option value="high">Yüksek</option>
+      </select>
+      <span class="sep"></span>
+      <button id="btn-kbd" title="Dokunmatik klavyeyi aç">⌨ Klavye</button>
+      <button data-combo="MetaLeft" title="Başlat menüsü">⊞ Win</button>
+      <button data-combo="AltLeft,Tab" title="Pencere değiştir">Alt+Tab</button>
+      <button data-combo="MetaLeft,KeyD" title="Masaüstünü göster">Win+D</button>
+      <button data-combo="ControlLeft,ShiftLeft,Escape" title="Görev Yöneticisi">Görev Yön.</button>
+      <button id="btn-clip" title="Pano ve metin gönderme">📋 Pano</button>
+      <button id="btn-full" title="Tam ekran">⛶</button>
+      <span class="sep"></span>
+      <span id="status" class="muted">Bağlanıyor…</span>
+      <button id="btn-logout" class="danger" title="Oturumu kapat">Çıkış</button>
+      <button id="btn-hide" title="Araç çubuğunu gizle">▲</button>
+    </header>
+    <button id="btn-show" title="Araç çubuğunu göster" hidden>▼</button>
+
+    <main id="stage">
+      <canvas id="screen" tabindex="0"></canvas>
+      <div id="cursor" hidden></div>
+      <div id="overlay" hidden></div>
+    </main>
+
+    <textarea id="kbd" autocapitalize="off" autocomplete="off" spellcheck="false" aria-label="Klavye girişi"></textarea>
+
+    <dialog id="clip-dialog">
+      <form method="dialog" class="card">
+        <h2>Pano</h2>
+        <textarea id="clip-text" rows="8" placeholder="Buraya yapıştırın veya uzak panoyu alın"></textarea>
+        <div class="row">
+          <button type="button" id="clip-get">⬇ Uzak panoyu al</button>
+          <button type="button" id="clip-set">⬆ Uzak panoya gönder</button>
+          <button type="button" id="clip-type">⌨ Metni yazdır</button>
+          <button value="close" class="primary">Kapat</button>
+        </div>
+      </form>
+    </dialog>
+  </section>
+
+  <div id="toast" role="status" hidden></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

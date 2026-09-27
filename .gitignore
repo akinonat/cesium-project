@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+build/
+dist/
+*.spec
+.pytest_cache/
+# Yerel yapilandirma (parola ozeti, sertifikalar) asla depoya girmesin
+config.json
+*.pem
+*.log
