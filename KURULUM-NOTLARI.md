@@ -32,14 +32,14 @@ izleyin. Genel kullanım ve sorun giderme için `README.md` dosyasına bakın.
    ```powershell
    New-Item -ItemType Directory -Force "C:\Users\MapSurvey\Desktop\Claude" | Out-Null
    Expand-Archive "C:\Users\MapSurvey\Downloads\uzak-masaustu.zip" -DestinationPath "C:\Users\MapSurvey\Desktop\Claude" -Force
-   Rename-Item "C:\Users\MapSurvey\Desktop\Claude\Uzak Masaustu" "Uzak Masaustu"
+   Rename-Item "C:\Users\MapSurvey\Desktop\Claude\uzak-masaustu" "Uzak Masaustu"
    ```
-   Klasör `C:\Users\MapSurvey\Desktop\Claude\Uzak Masaustu` olarak çıkar. İndirilen dosyanın adı farklıysa
+   Sonuç: `C:\Users\MapSurvey\Desktop\Claude\Uzak Masaustu`. İndirilen dosyanın adı farklıysa
    (ör. `uzak-masaustu (1).zip`) komutta düzeltin.
 
    Drive'daki ZIP'e ulaşamazsanız ikinci kopya (GitHub'a giriş yapmış olmalısınız):
    https://github.com/akinonat/cesium-project/archive/refs/heads/claude/windows-remote-desktop-control-5e94s7.zip
-   — bu ZIP'ten çıkan klasörün adını `uzak-masaustu` yapın.
+   — bu ZIP'ten çıkan klasörü `C:\Users\MapSurvey\Desktop\Claude` içine koyup adını `Uzak Masaustu` yapın.
 
 ### 2. Tailscale
 
