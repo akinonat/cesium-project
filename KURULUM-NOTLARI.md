@@ -147,10 +147,14 @@ gerekirse SHARE'deki yöntemi uygulayın (tercihen korumalı bir klasöre yenide
 Kurulumdan 5 dakika sonra yönetici PowerShell'de:
 
 ```powershell
-Get-Content C:\ProgramData\RemoteAgent\watchdog.log -Tail 5 -Encoding UTF8
+cd C:\uzak-masaustu
+powershell -ExecutionPolicy Bypass -File .\scripts\kontrol.ps1
 ```
 
-"Her şey yolunda (Tailscale: Running)" görünmeli. Ardından Surface'i iPhone erişim
+Tüm ayarları (program, bekçi, Tailscale, güvenlik duvarı, güç/kilit, otomatik oturum
+açma, UAC, sormadan açılan programlar, Netcad, Windows Güvenliği) denetler; hiçbir
+şeyi değiştirmez. `[SORUN]` satırı olmamalı. Windows güncellemesinden ya da güvenlik
+ayarı değişikliğinden sonra da çalıştırın. Ardından Surface'i iPhone erişim
 noktasına bağlayıp (gerçek "dışarıdan" deneme) bağlanın.
 
 ## Günlük kullanım hatırlatmaları

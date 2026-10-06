@@ -302,6 +302,7 @@ Stop-ScheduledTask RemoteAgent; Start-ScheduledTask RemoteAgent
 | Siyah ekran / "kilitli" uyarısı | Ofis PC kilitli ya da UAC penceresi açık — bkz. [Kilit ekranı](#kilit-ekranı-önemli) |
 | Yönetici olarak açılmış bir pencereye tıklanamıyor | Görev "en yüksek ayrıcalıklarla" çalışmalı; `install.ps1`'i yönetici olarak yeniden çalıştırın |
 | Görüntü yavaş | Kaliteyi **Düşük** yapın; mobil veride Tailscale doğrudan bağlantı kuramazsa (DERP röle) hız düşebilir |
+| Bir şey değişti, ne olduğunu bilmiyorum | Yönetici PowerShell'de `powershell -ExecutionPolicy Bypass -File .\scripts\kontrol.ps1` — tüm ayarları denetler, `[SORUN]` satırlarında ne yapılacağını yazar |
 | Ayrıntılı günlük görmek istiyorum | Görevi durdurup `scripts\run-console.bat` ile konsolda çalıştırın |
 
 Kaldırmak için (yönetici PowerShell, proje klasöründe):
@@ -336,6 +337,7 @@ scripts/
   install.ps1    Windows kurulum (görev, güvenlik duvarı, güç, isteğe bağlı RDP)
   uninstall.ps1  kaldırma
   run-console.bat  sorun giderme için konsolda çalıştırma
+  kontrol.ps1           tüm ayarları denetler (yalnızca okur); güncelleme sonrası çalıştırın
   yonetici-tara.ps1     yönetici izni (UAC) isteyecek programları listeler
   yonetici-kisayol.ps1  bir programı UAC sormadan açan kısayol oluşturur
 ```
