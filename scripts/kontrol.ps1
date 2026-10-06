@@ -274,6 +274,13 @@ foreach ($path in "HKCU:\Software\Policies\Microsoft\Windows\Control Panel\Deskt
 if ($ssLocked) { Report SORUN "Ekran koruyucu açılınca bilgisayar kilitleniyor" "Ayarlar -> Kişiselleştirme -> Kilit ekranı -> Ekran koruyucu -> 'Sürdürüldüğünde oturum açma ekranını görüntüle' kutusunu kaldırın." }
 else { Report OK "Ekran koruyucu kilitlemiyor" }
 
+$acct = Get-LocalUser -Name $env:USERNAME
+if ($acct -and "$($acct.PrincipalSource)" -eq "MicrosoftAccount") {
+    Report DIKKAT "Hesap ($env:USERNAME) bir Microsoft hesabına bağlı" "Microsoft hesabının parolası değişince otomatik oturum açma bozulur. Yerel hesaba dönmek için: Ayarlar -> Hesaplar -> Bilgileriniz -> 'Bunun yerine yerel hesapla oturum açın'."
+} elseif ($acct) {
+    Report OK "Yerel hesap kullanılıyor ($env:USERNAME)"
+}
+
 $wl = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
 if ((Get-RegValue $wl "AutoAdminLogon") -eq "1") {
     Report OK "Otomatik oturum açma açık ($(Get-RegValue $wl 'DefaultUserName'))"

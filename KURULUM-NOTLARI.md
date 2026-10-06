@@ -89,7 +89,8 @@ Bilgisayar yeniden başlayınca parola sormadan masaüstü gelsin, program çal�
 1. https://learn.microsoft.com/sysinternals/downloads/autologon → indirin, ayıklayın.
 2. `Autologon64.exe` → **Agree**.
 3. Username: `MAPSURVEY`, Domain: `DESKTOP-O22ECE0`, Password: Windows parolası
-   (PIN değil) → **Enable**.
+   (**PIN değil**; PIN'i oluştururken sorulan hesap parolası) → **Enable**.
+   Hesap **yerel hesap** olmalı (Ayarlar → Hesaplar → Bilgileriniz → "Yerel hesap").
 4. Bilgisayarı yeniden başlatıp PIN sormadan masaüstünün geldiğini kontrol edin.
 
 ### 6. "Evet/Hayır" (UAC) soran programlar
@@ -174,6 +175,13 @@ noktasına bağlayıp (gerçek "dışarıdan" deneme) bağlanın.
 - Şarj aleti takılı kalsın. Kapak kapatılabilir, bilgisayar uyumaz.
 - **Win+L ile kilitlemeyin**; kilitli ekran uzaktan açılamaz (Windows Home'da RDP yok).
 - Uzaktayken **program kurmayın/güncellemeyin**; kurulumlar "Evet/Hayır" sorar.
+- Windows **"Microsoft hesabıyla oturum açın"** önerirse (ör. Windows Güvenliği'nde
+  hesap koruması) **kabul etmeyin**. Hesap Microsoft hesabına dönüşünce parolası
+  değişir ve otomatik oturum açma kapanır (06.10.2026'da bu oldu; yerel hesaba
+  dönülüp Autologon yeni parolayla yeniden yapıldı). Windows parolasını
+  değiştirirseniz de Autologon'u yeni parolayla tekrar çalıştırın.
+- Windows güncellemesinden veya güvenlik ayarı değişikliğinden sonra
+  `kontrol.ps1`'i çalıştırın.
 - Büyük dosyalar için SendGB vb. siteleri ev bilgisayarının tarayıcısında kullanın
   (dosya ev internetine iner, mobil veri harcanmaz).
 - Surface'te ekranın üstünde **sarı uyarı şeridi** çıkarsa talimatını izleyin
