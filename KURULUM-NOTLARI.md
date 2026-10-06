@@ -20,7 +20,7 @@ izleyin. Genel kullanım ve sorun giderme için `README.md` dosyasına bakın.
 | **Bağlanma adresi** | **http://100.103.108.113:8765** (Surface ve iPhone'dan; bilgisayar adıyla açılmıyor, IP kullanın) |
 | Program | `C:\Program Files\RemoteAgent` |
 | Ayarlar ve günlükler | `C:\ProgramData\RemoteAgent` (`agent.log`, `watchdog.log`) |
-| Kurulum dosyaları | `C:\uzak-masaustu` |
+| Kurulum dosyaları | `C:\Users\MapSurvey\Desktop\Claude\uzak-masaustu` |
 | Yedek | Google Drive'daki `uzak-masaustu.zip` (ikinci kopya: GitHub `akinonat/cesium-project` deposu, `claude/windows-remote-desktop-control-5e94s7` dalı) |
 
 ## Sıfırdan kurulum
@@ -28,8 +28,13 @@ izleyin. Genel kullanım ve sorun giderme için `README.md` dosyasına bakın.
 ### 1. Kurulum dosyalarını indirin
 
 1. Google Drive'daki **uzak-masaustu.zip** dosyasını indirin.
-2. ZIP'e sağ tık → **Tümünü ayıkla** → hedef `C:\`. Klasör doğrudan
-   `C:\uzak-masaustu` olarak çıkar.
+2. PowerShell'de (yönetici olması gerekmez) ZIP'i yerine çıkarın:
+   ```powershell
+   New-Item -ItemType Directory -Force "C:\Users\MapSurvey\Desktop\Claude" | Out-Null
+   Expand-Archive "C:\Users\MapSurvey\Downloads\uzak-masaustu.zip" -DestinationPath "C:\Users\MapSurvey\Desktop\Claude" -Force
+   ```
+   Klasör `C:\Users\MapSurvey\Desktop\Claude\uzak-masaustu` olarak çıkar. İndirilen dosyanın adı farklıysa
+   (ör. `uzak-masaustu (1).zip`) komutta düzeltin.
 
    Drive'daki ZIP'e ulaşamazsanız ikinci kopya (GitHub'a giriş yapmış olmalısınız):
    https://github.com/akinonat/cesium-project/archive/refs/heads/claude/windows-remote-desktop-control-5e94s7.zip
@@ -50,7 +55,7 @@ izleyin. Genel kullanım ve sorun giderme için `README.md` dosyasına bakın.
 Yönetici PowerShell'de:
 
 ```powershell
-cd C:\uzak-masaustu
+cd "C:\Users\MapSurvey\Desktop\Claude\uzak-masaustu"
 powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
 ```
 
@@ -85,7 +90,7 @@ Bilgisayar yeniden başlayınca parola sormadan masaüstü gelsin, program çal�
 UAC penceresi uzaktan tıklanamaz. Önce tarayın:
 
 ```powershell
-cd C:\uzak-masaustu
+cd "C:\Users\MapSurvey\Desktop\Claude\uzak-masaustu"
 powershell -ExecutionPolicy Bypass -File .\scripts\yonetici-tara.ps1
 ```
 
@@ -125,7 +130,7 @@ foreach ($root in "HKCU:", "HKLM:") {
    → **Erişim reddedildi** vermeli.
 3. Sormadan açan kısayol (yönetici PowerShell; sarı uyarı beklenen bir durum):
    ```powershell
-   cd C:\uzak-masaustu
+   cd "C:\Users\MapSurvey\Desktop\Claude\uzak-masaustu"
    powershell -ExecutionPolicy Bypass -File .\scripts\yonetici-kisayol.ps1 -Exe "C:\Share PointClouds\SHARE Product\SHARE PointClouds Studio\SHARE PointClouds Studio.exe" -Name "SHARE PointClouds Studio"
    ```
    Uzaktan her zaman masaüstündeki **"SHARE PointClouds Studio (sormadan)"**
@@ -147,7 +152,7 @@ gerekirse SHARE'deki yöntemi uygulayın (tercihen korumalı bir klasöre yenide
 Kurulumdan 5 dakika sonra yönetici PowerShell'de:
 
 ```powershell
-cd C:\uzak-masaustu
+cd "C:\Users\MapSurvey\Desktop\Claude\uzak-masaustu"
 powershell -ExecutionPolicy Bypass -File .\scripts\kontrol.ps1
 ```
 
