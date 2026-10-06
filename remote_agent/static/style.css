@@ -50,8 +50,9 @@ button.danger { border-color: var(--danger); color: #ffb1b1; }
   overflow: hidden; background: #000; }
 #screen { display: block; touch-action: none; outline: none; cursor: default;
   image-rendering: auto; -webkit-user-select: none; user-select: none; }
-#cursor { position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px;
-  border: 2px solid #fff; border-radius: 50%; box-shadow: 0 0 0 1px #000;
+/* Uzak imleç: içi beyaz, dışı siyah küçük nokta (her renk zeminde görünsün diye) */
+#cursor { position: absolute; width: 8px; height: 8px; margin: -4px 0 0 -4px;
+  background: #fff; border: 1px solid #000; border-radius: 50%;
   pointer-events: none; }
 #overlay { position: absolute; inset: 0; display: grid; place-items: center;
   background: rgba(0, 0, 0, .6); font-size: 1.1rem; text-align: center; padding: 16px;
