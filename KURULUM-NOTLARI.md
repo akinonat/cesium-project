@@ -20,7 +20,7 @@ izleyin. Genel kullanım ve sorun giderme için `README.md` dosyasına bakın.
 | **Bağlanma adresi** | **http://100.103.108.113:8765** (Surface ve iPhone'dan; bilgisayar adıyla açılmıyor, IP kullanın) |
 | Program | `C:\Program Files\RemoteAgent` |
 | Ayarlar ve günlükler | `C:\ProgramData\RemoteAgent` (`agent.log`, `watchdog.log`) |
-| Kurulum dosyaları | `C:\Users\MapSurvey\Desktop\Claude\uzak-masaustu` |
+| Kurulum dosyaları | `C:\Users\MapSurvey\Desktop\Claude\Uzak Masaustu` |
 | Yedek | Google Drive'daki `uzak-masaustu.zip` (ikinci kopya: GitHub `akinonat/cesium-project` deposu, `claude/windows-remote-desktop-control-5e94s7` dalı) |
 
 ## Sıfırdan kurulum
@@ -32,8 +32,9 @@ izleyin. Genel kullanım ve sorun giderme için `README.md` dosyasına bakın.
    ```powershell
    New-Item -ItemType Directory -Force "C:\Users\MapSurvey\Desktop\Claude" | Out-Null
    Expand-Archive "C:\Users\MapSurvey\Downloads\uzak-masaustu.zip" -DestinationPath "C:\Users\MapSurvey\Desktop\Claude" -Force
+   Rename-Item "C:\Users\MapSurvey\Desktop\Claude\Uzak Masaustu" "Uzak Masaustu"
    ```
-   Klasör `C:\Users\MapSurvey\Desktop\Claude\uzak-masaustu` olarak çıkar. İndirilen dosyanın adı farklıysa
+   Klasör `C:\Users\MapSurvey\Desktop\Claude\Uzak Masaustu` olarak çıkar. İndirilen dosyanın adı farklıysa
    (ör. `uzak-masaustu (1).zip`) komutta düzeltin.
 
    Drive'daki ZIP'e ulaşamazsanız ikinci kopya (GitHub'a giriş yapmış olmalısınız):
@@ -55,7 +56,7 @@ izleyin. Genel kullanım ve sorun giderme için `README.md` dosyasına bakın.
 Yönetici PowerShell'de:
 
 ```powershell
-cd "C:\Users\MapSurvey\Desktop\Claude\uzak-masaustu"
+cd "C:\Users\MapSurvey\Desktop\Claude\Uzak Masaustu"
 powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
 ```
 
@@ -63,6 +64,12 @@ powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
 - Betik şunları kendisi yapar: Python, program dosyaları, güvenlik duvarı (yalnızca
   Tailscale), oturum açılışında otomatik başlatma, 5 dakikalık bekçi görevi,
   prizdeyken uyku kapalı, **kapak kapanınca uyumama**, **uyanınca parola sormama**.
+- Program yönetici yetkisiyle çalıştığı için yalnızca **tüm kullanıcılar için** kurulmuş
+  Python'u (`C:\Program Files\Python3xx`) kullanır; yoksa Python 3.13'ü öyle kurar.
+  Kullanıcı klasöründeki Python (ör. `AppData\Local\Python\pythoncore-3.14-64`)
+  kullanılmaz.
+- Betiği yeniden çalıştırmak güvenlidir: mevcut parola korunur (değiştirmek için
+  sonuna `-ResetPassword` ekleyin).
 - Kontrol: tarayıcıda http://localhost:8765 açılıp giriş yapılabilmeli.
 
 ### 4. Kilit ayarları
@@ -90,7 +97,7 @@ Bilgisayar yeniden başlayınca parola sormadan masaüstü gelsin, program çal�
 UAC penceresi uzaktan tıklanamaz. Önce tarayın:
 
 ```powershell
-cd "C:\Users\MapSurvey\Desktop\Claude\uzak-masaustu"
+cd "C:\Users\MapSurvey\Desktop\Claude\Uzak Masaustu"
 powershell -ExecutionPolicy Bypass -File .\scripts\yonetici-tara.ps1
 ```
 
@@ -130,7 +137,7 @@ foreach ($root in "HKCU:", "HKLM:") {
    → **Erişim reddedildi** vermeli.
 3. Sormadan açan kısayol (yönetici PowerShell; sarı uyarı beklenen bir durum):
    ```powershell
-   cd "C:\Users\MapSurvey\Desktop\Claude\uzak-masaustu"
+   cd "C:\Users\MapSurvey\Desktop\Claude\Uzak Masaustu"
    powershell -ExecutionPolicy Bypass -File .\scripts\yonetici-kisayol.ps1 -Exe "C:\Share PointClouds\SHARE Product\SHARE PointClouds Studio\SHARE PointClouds Studio.exe" -Name "SHARE PointClouds Studio"
    ```
    Uzaktan her zaman masaüstündeki **"SHARE PointClouds Studio (sormadan)"**
@@ -152,7 +159,7 @@ gerekirse SHARE'deki yöntemi uygulayın (tercihen korumalı bir klasöre yenide
 Kurulumdan 5 dakika sonra yönetici PowerShell'de:
 
 ```powershell
-cd "C:\Users\MapSurvey\Desktop\Claude\uzak-masaustu"
+cd "C:\Users\MapSurvey\Desktop\Claude\Uzak Masaustu"
 powershell -ExecutionPolicy Bypass -File .\scripts\kontrol.ps1
 ```
 
