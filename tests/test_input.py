@@ -27,3 +27,12 @@ def test_unknown_key_and_button_ignored():
     assert b.key("NoSuchKey", True) is False
     b.button("side", True)
     assert b.events == []
+
+
+def test_move_skipped_when_cursor_already_there():
+    b = RecordingBackend()
+    b.move(100, 200)
+    b.move(100, 200)  # aynı yer: tekrar hareket gönderilmez
+    b.button("left", True)
+    b.move(101, 200)
+    assert b.events == [("move", 100, 200), ("button", "left", True), ("move", 101, 200)]

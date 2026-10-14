@@ -140,7 +140,7 @@ def main(argv: list[str] | None = None) -> None:
         source.pointer_fn = backend.cursor_pos
     else:
         backend = make_backend()
-        source = MssSource()
+        source = MssSource(capture_layered=cfg.capture_layered)
 
     if cfg.keep_awake:
         winutil.keep_awake(True)

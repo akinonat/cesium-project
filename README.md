@@ -301,6 +301,8 @@ Stop-ScheduledTask RemoteAgent; Start-ScheduledTask RemoteAgent
 | Sarı uyarı şeridi çıkıyor | Bekçinin çözemediği bir sorun var (çoğunlukla Tailscale anahtarı); şeritteki talimatı izleyin |
 | Siyah ekran / "kilitli" uyarısı | Ofis PC kilitli ya da UAC penceresi açık — bkz. [Kilit ekranı](#kilit-ekranı-önemli) |
 | Yönetici olarak açılmış bir pencereye tıklanamıyor | Görev "en yüksek ayrıcalıklarla" çalışmalı; `install.ps1`'i yönetici olarak yeniden çalıştırın |
+| Sağ tık menüsünde "Yeni" gibi alt menüler açılıp hemen kapanıyor | Programın güncel sürümünde düzeltildi (ekran yakalamada `CAPTUREBLT` kapatıldı). Hemen çözüm: Dosya Gezgini'nde yeni klasör için **Ctrl+Shift+N** |
+| Bir açılır pencere (ipucu, menü) uzak görüntüde hiç görünmüyor | `C:\ProgramData\RemoteAgent\config.json` içinde `"capture_layered": true` yapıp programı yeniden başlatın (`Stop-ScheduledTask RemoteAgent; Start-ScheduledTask RemoteAgent`) |
 | Görüntü yavaş | Kaliteyi **Düşük** yapın; mobil veride Tailscale doğrudan bağlantı kuramazsa (DERP röle) hız düşebilir |
 | Bir şey değişti, ne olduğunu bilmiyorum | Yönetici PowerShell'de `powershell -ExecutionPolicy Bypass -File .\scripts\kontrol.ps1` — tüm ayarları denetler, `[SORUN]` satırlarında ne yapılacağını yazar |
 | Ayrıntılı günlük görmek istiyorum | Görevi durdurup `scripts\run-console.bat` ile konsolda çalıştırın |

@@ -8,6 +8,7 @@ Kablo formatı (little-endian, tek bir WebSocket ikili mesajı):
 
 from __future__ import annotations
 
+import importlib
 import io
 import math
 import struct
@@ -45,13 +46,35 @@ class Monitor:
         }
 
 
+def disable_captureblt() -> bool:
+    """mss'in her karede kullandığı CAPTUREBLT bayrağını kapatır.
+
+    Bu bayrak yakalama sırasında imleci gizleyip gösterir ve Windows 11'in sağ tık
+    menüsündeki "Yeni" gibi alt menülerin açılır açılmaz kapanmasına yol açıyordu.
+    Windows 8 ve sonrasında ekran DWM ile birleştirildiği için bayrak olmadan da
+    açılır pencereler görüntüye girer.
+    """
+    done = False
+    for name in ("mss.windows.gdi", "mss.windows"):  # mss 10 / mss 9
+        try:
+            mod = importlib.import_module(name)
+        except Exception:  # Windows dışında yüklenemez
+            continue
+        if hasattr(mod, "CAPTUREBLT"):
+            mod.CAPTUREBLT = 0
+            done = True
+    return done
+
+
 class MssSource:
     """Gerçek ekran (mss). mss nesneleri iş parçacığına özel olduğundan her iş
     parçacığı kendi örneğini tembel olarak oluşturur."""
 
-    def __init__(self) -> None:
+    def __init__(self, capture_layered: bool = False) -> None:
         import mss  # noqa: F401  (erken hata vermek için)
 
+        if not capture_layered:
+            disable_captureblt()
         self._local = threading.local()
 
     def _sct(self):

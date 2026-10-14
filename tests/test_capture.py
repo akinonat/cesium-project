@@ -54,3 +54,19 @@ def test_scale_to_width():
     img = Image.new("RGB", (3840, 2160))
     assert scale_to_width(img, 1920).size == (1920, 1080)
     assert scale_to_width(img, 0) is img
+
+
+def test_disable_captureblt_patches_module_global(monkeypatch):
+    import sys
+    import types
+
+    from remote_agent.capture import disable_captureblt
+
+    # mss.windows.gdi'nin taklidi: BitBlt bayrağı her çağrıda modül değişkeninden okunur
+    gdi = types.ModuleType("mss.windows.gdi")
+    exec("CAPTUREBLT = 0x40000000\nSRCCOPY = 0x00CC0020\n"
+         "def flags():\n    return SRCCOPY | CAPTUREBLT\n", gdi.__dict__)
+    monkeypatch.setitem(sys.modules, "mss.windows.gdi", gdi)
+    assert gdi.flags() == 0x40CC0020
+    assert disable_captureblt() is True
+    assert gdi.flags() == 0x00CC0020

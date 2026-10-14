@@ -61,6 +61,9 @@ class Config:
     fps: int = 15
     quality: int = 60
     max_width: int = 1920
+    # True: ekran CAPTUREBLT ile yakalanır (eski davranış). Alt menüleri kapattığı
+    # için kapalı; bir açılır pencere görüntüde hiç görünmezse açın.
+    capture_layered: bool = False
 
     @classmethod
     def load(cls, path: Path) -> "Config":

@@ -57,6 +57,10 @@ class InputBackend:
 
     # --- Genel API ---
     def move(self, x: int, y: int) -> None:
+        # İmleç zaten oradaysa hareket gönderme: tıklamadan hemen önce gelen gereksiz
+        # hareketler açık menüleri (ör. sağ tık > Yeni) kapatabiliyor
+        if self.cursor_pos() == (x, y):
+            return
         self._move(x, y)
 
     def button(self, button: str, down: bool) -> None:
